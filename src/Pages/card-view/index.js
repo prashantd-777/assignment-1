@@ -8,6 +8,7 @@ const PAGE_LIMIT = 10;
 const CardView = () => {
     const [photosList, setPhotosList] = useState([]);
     const [filterList, setFilterList] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [page, setPage] = useState(0);
     const [searchValue, setSearchValue] = useState("")
 
@@ -29,10 +30,12 @@ const CardView = () => {
             if (response?.length > 0) {
                 setPhotosList(response);
                 setPage(1);
+                setIsLoading(false)
             }
         }).catch(error => {
             console.log("error", error);
             setPhotosList([]);
+            setIsLoading(false)
         })
     }
 
@@ -66,35 +69,43 @@ const CardView = () => {
                     handleSearch={handleSearch}
                 />
             </div>
-            <div>
-                {(filterSearchList(filterList) || []).map(item => {
-                    return (
-                        <Card
-                            key={item?.id}
-                            item={item}
-                        />
-                    )
-                })}
-            </div>
-
-            <div className={"pagination-container"}>
-                <button
-                    className={`${page <= 1 && "disabled-button"}`}
-                    disabled={page <= 1}
-                    onClick={() => handlePageChange(page - 1)}>
-                    Previous
-                </button>
-                <div className={"page-title"}>
-                    Page {page} of {getTotalPages()}
+            {isLoading ? (
+                <div className={"loading-container"}>
+                    Loading ...
                 </div>
-                <button
-                    className={`${page >= getTotalPages() && "disabled-button"}`}
-                    disabled={page >= getTotalPages()}
-                    onClick={() => handlePageChange(page + 1)}
-                >
-                    Next
-                </button>
-            </div>
+            ) : (
+                <>
+                    <div>
+                        {(filterSearchList(filterList) || []).map(item => {
+                            return (
+                                <Card
+                                    key={item?.id}
+                                    item={item}
+                                />
+                            )
+                        })}
+                    </div>
+
+                    <div className={"pagination-container"}>
+                        <button
+                            className={`${page <= 1 && "disabled-button"}`}
+                            disabled={page <= 1}
+                            onClick={() => handlePageChange(page - 1)}>
+                            Previous
+                        </button>
+                        <div className={"page-title"}>
+                            Page {page} of {getTotalPages()}
+                        </div>
+                        <button
+                            className={`${page >= getTotalPages() && "disabled-button"}`}
+                            disabled={page >= getTotalPages()}
+                            onClick={() => handlePageChange(page + 1)}
+                        >
+                            Next
+                        </button>
+                    </div>
+                </>
+            )}
         </div>
     )
 }
